@@ -81,6 +81,13 @@ public static class DependencyInjectionExtensions
     {
         builder.Services.AddHealthChecks();
         // SQL server required before activation, to append above - .AddSqlServer(builder.Configuration.GetConnectionString("Default"))
+
+        builder.Services.AddHealthChecksUI(opts =>
+        {
+            opts.AddHealthCheckEndpoint("api", "/health");
+            opts.SetEvaluationTimeInSeconds(60);
+            opts.SetMinimumSecondsBetweenFailureNotifications(10);
+        }).AddInMemoryStorage();
     }
 
     public static void AddAuthenticationServices(this WebApplicationBuilder builder)
