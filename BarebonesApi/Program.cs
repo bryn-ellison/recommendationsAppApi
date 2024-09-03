@@ -2,7 +2,10 @@ using BarebonesApi.StartupConfig;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServices();
+builder.AddStandardServices();
+builder.AddAuthenticationServices();
+builder.AddAuthorizationServices();
+builder.AddHealthCheckServices();
 
 var app = builder.Build();
 
