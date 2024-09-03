@@ -6,6 +6,7 @@ builder.AddStandardServices();
 builder.AddAuthenticationServices();
 builder.AddAuthorizationServices();
 builder.AddHealthCheckServices();
+builder.AddVersioningServices();
 
 var app = builder.Build();
 

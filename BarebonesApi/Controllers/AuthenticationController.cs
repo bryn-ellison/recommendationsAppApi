@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ToDoApi.Controllers;
+namespace ToDoApi.v1.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -23,6 +24,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("token")]
     [AllowAnonymous]
+    [ApiVersionNeutral]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
     {
         var user = ValidateCredentials(data);
