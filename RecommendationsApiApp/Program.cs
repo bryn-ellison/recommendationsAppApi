@@ -1,4 +1,4 @@
-using BarebonesApi.StartupConfig;
+using RecommendationsApi.StartupConfig;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 

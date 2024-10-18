@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BarebonesApi.Controllers.v1
+namespace RecommendationsApi.Controllers.v1.Users
 {
     [Route("api/[controller]")]
     [ApiController]

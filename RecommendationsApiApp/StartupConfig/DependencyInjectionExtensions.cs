@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 
-namespace BarebonesApi.StartupConfig;
+namespace RecommendationsApi.StartupConfig;
 
 public static class DependencyInjectionExtensions
 {
@@ -48,8 +48,8 @@ public static class DependencyInjectionExtensions
             opts.AddSecurityDefinition("bearerAuth", securityScheme);
             opts.AddSecurityRequirement(securityRequirement);
 
-            var title = "Barebones Versioned API";
-            var description = "This is a barebones api template that includes versioning, authentication, monitoring, healthchecks and rate limiting";
+            var title = "Recommendations App API";
+            var description = "This is an API that supports the recommendations app being built by Bryn Ellison";
             var terms = new Uri("https://localhost:7000/terms");
             var contact = new OpenApiContact()
             {
@@ -96,12 +96,12 @@ public static class DependencyInjectionExtensions
         {
             opts.TokenValidationParameters = new()
             {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Authentication:SecretKey"))),
+                ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateIssuerSigningKey = true,
                 ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
-                ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Authentication:SecretKey")))
             };
         });
     }
