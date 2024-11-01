@@ -1,18 +1,36 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using RecommendationsAppApiLibrary.DataAccess;
+using RecommendationsAppApiLibrary.Models;
+
 
 namespace RecommendationsApi.Controllers.v1.Users
 {
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
+        private readonly IUserData _data;
+
+        public UsersController(IUserData data)
+        {
+            _data = data;
+        }
+
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<List<UserModel>>> GetAllUsers()
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                List<UserModel> output = await _data.LoadUsers();
+                return Ok(output);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET api/<UserController>/5

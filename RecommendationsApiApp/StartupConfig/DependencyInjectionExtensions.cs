@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RecommendationsAppApiLibrary.DataAccess;
 using System.Text;
+using System.Text.Json.Serialization;
 
 
 namespace RecommendationsApi.StartupConfig;
@@ -11,9 +13,21 @@ public static class DependencyInjectionExtensions
 {
     public static void AddStandardServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddEndpointsApiExplorer();
         builder.AddSwaggerServices();
+    }
+
+    public static void AddCustomServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<ISqliteDataAccess, SqliteDataAccess>();
+        builder.Services.AddSingleton<IUserData, UserData>();
+    }
+
+    public static void AddCorsServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors();
     }
 
     private static void AddSwaggerServices(this WebApplicationBuilder builder)
@@ -69,6 +83,22 @@ public static class DependencyInjectionExtensions
         });
     }
 
+    public static void AddAuthenticationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddAuthentication("Bearer").AddJwtBearer(opts =>
+        {
+            opts.TokenValidationParameters = new()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Authentication:SecretKey"))),
+                ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
+            };
+        });
+    }
+
     public static void AddAuthorizationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddAuthorization(opts =>
@@ -90,21 +120,6 @@ public static class DependencyInjectionExtensions
         }).AddInMemoryStorage();
     }
 
-    public static void AddAuthenticationServices(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddAuthentication("Bearer").AddJwtBearer(opts =>
-        {
-            opts.TokenValidationParameters = new()
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Authentication:SecretKey"))),
-                ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
-            };
-        });
-    }
 
     public static void AddVersioningServices(this WebApplicationBuilder builder)
     {

@@ -6,23 +6,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ToDoApi.v1.Controllers;
+namespace RecommendationsApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthenticationController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
 
-    public AuthenticationController(IConfiguration config)
+    public AuthController(IConfiguration config)
     {
         _config = config;
     }
 
-    public record AuthenticationData(string? UserName, string? Password);
+    public record AuthenticationData(string? Email, string? Password);
     public record UserData(int Id, string FirstName, string LastName, string UserName);
+    public record ResponseData(string Jwt, UserData user);
 
-    [HttpPost("token")]
+    [HttpPost("login")]
     [AllowAnonymous]
     [ApiVersionNeutral]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
@@ -31,12 +32,13 @@ public class AuthenticationController : ControllerBase
 
         if (user is null)
         {
-            return Unauthorized();
+            return Unauthorized("Login detail incorrect, try again!");
         }
 
         var token = GenerateToken(user);
+        var response = new ResponseData(token, user);
 
-        return Ok(token);
+        return Ok(response);
     }
 
     private string GenerateToken(UserData user)
@@ -63,10 +65,10 @@ public class AuthenticationController : ControllerBase
 
     private UserData? ValidateCredentials(AuthenticationData data)
     {
-        // This is not production code - repleace this with call to chosen third part auth system!
-        if (CompareValues(data.UserName, "bellison") && CompareValues(data.Password, "password"))
+        // This is not production code - replace this with call to chosen third part auth system!
+        if (CompareValues(data.Email, "bryn.ellison@bryn.com") && CompareValues(data.Password, "password"))
         {
-            return new UserData(1, "Bryn", "Ellison", data.UserName!);
+            return new UserData(1, "Bryn", "Ellison", data.Email!);
         }
 
         return null;
